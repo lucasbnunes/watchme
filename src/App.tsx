@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { SideBar } from './components/SideBar';
 import { Content } from './components/Content';
@@ -37,15 +37,24 @@ export function App() {
     {} as GenreResponseProps
   );
 
+  function handleClickButton(id: number) {
+    setSelectedGenreId(id);
+  }
+
+  const memoizedHandleClickButton = useCallback(
+    (id: number) => handleClickButton(id),
+    []
+  );
+
   const memoizedSidebar = useMemo(
     () => (
       <SideBar
         genres={genres}
         selectedGenreId={selectedGenreId}
-        buttonClickCallback={handleClickButton}
+        buttonClickCallback={memoizedHandleClickButton}
       />
     ),
-    [genres, selectedGenreId, handleClickButton]
+    [genres, selectedGenreId, memoizedHandleClickButton]
   );
 
   const memoizedContent = useMemo(
@@ -71,10 +80,6 @@ export function App() {
 
     setSelectedGenre(newSelectedGenre);
   }, [selectedGenreId, genres]);
-
-  function handleClickButton(id: number) {
-    setSelectedGenreId(id);
-  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
