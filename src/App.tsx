@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { SideBar } from './components/SideBar';
 import { Content } from './components/Content';
@@ -37,6 +37,22 @@ export function App() {
     {} as GenreResponseProps
   );
 
+  const memoizedSidebar = useMemo(
+    () => (
+      <SideBar
+        genres={genres}
+        selectedGenreId={selectedGenreId}
+        buttonClickCallback={handleClickButton}
+      />
+    ),
+    [genres, selectedGenreId, handleClickButton]
+  );
+
+  const memoizedContent = useMemo(
+    () => <Content selectedGenre={selectedGenre} movies={movies} />,
+    [selectedGenre, movies]
+  );
+
   useEffect(() => {
     api.get<GenreResponseProps[]>('genres').then((response) => {
       setGenres(response.data);
@@ -62,13 +78,9 @@ export function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <SideBar
-        genres={genres}
-        selectedGenreId={selectedGenreId}
-        buttonClickCallback={handleClickButton}
-      />
+      {memoizedSidebar}
 
-      <Content selectedGenre={selectedGenre} movies={movies} />
+      {memoizedContent}
     </div>
   );
 }
